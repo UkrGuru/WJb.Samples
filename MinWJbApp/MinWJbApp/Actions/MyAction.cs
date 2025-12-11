@@ -15,7 +15,7 @@ public class MyAction : IAction
 
     public Task ExecAsync(CancellationToken ct)
     {
-        Console.WriteLine($"Hello from MyAction! name={_name}");
+        Console.WriteLine($"Hello {_name}!");
         return Task.CompletedTask;
     }
 }
