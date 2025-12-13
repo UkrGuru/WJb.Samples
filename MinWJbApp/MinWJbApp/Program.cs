@@ -28,12 +28,12 @@ var host = Host.CreateDefaultBuilder(args)
                 // The code "MyAction" must match what you pass to EnqueueJobAsync.
                 map["MyAction"] = new ActionItem(
                     // Fully qualified type name so the runtime can instantiate it via DI.
-                    Type: typeof(MyAction).AssemblyQualifiedName!,
+                    type: typeof(MyAction).AssemblyQualifiedName!,
 
                     // Default payload for this action. Fields here are merged with the job payload:
                     // - If a field is present in both defaults and job, the job's value overrides.
                     // - If a field is only in defaults, it remains available to the action.
-                    More: new { name = "Oleksandr" }
+                    more: new { name = "Oleksandr" }
                 );
             });
     })
