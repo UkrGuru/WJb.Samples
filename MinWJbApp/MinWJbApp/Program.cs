@@ -78,13 +78,11 @@ public class MyAction : IAction
     /// Signature matches <see cref="IAction.ExecAsync"/> requirements: (dynamic? more, CancellationToken).
     /// Use <see cref="MoreExtensions.ToJsonObject(object?)"/> to safely normalize arbitrary payloads.
     /// </remarks>
-    public Task ExecAsync(dynamic? jobMore, CancellationToken stoppingToken)
+    public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
-        // Normalize any dynamic/anonymous payload into JsonObject for safe access
-        JsonObject? more = MoreExtensions.ToJsonObject(jobMore);
 
         // Resolve "name" from payload; if absent, use the local fallback
-        var name = more.GetString("name") ?? _name;
+        var name = jobMore.GetString("name") ?? _name;
 
         // Example side effect (replace with your business logic)
         Console.WriteLine($"Hello {name}!");

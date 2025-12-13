@@ -59,19 +59,14 @@ await host.RunAsync();
 public sealed class DummyAction(ILogger<DummyAction> logger) : IAction
 {
     private readonly ILogger<DummyAction> _logger = logger;
-    private JsonObject _jobMore = new();
 
     // ExecAsync: main execution logic for the job
-    public Task ExecAsync(dynamic? jobMore, CancellationToken stoppingToken)
+    public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
-        // Capture job-specific parameters (if any)
-        _jobMore = jobMore ?? new JsonObject();
-        Console.WriteLine("DummyAction.InitAsync. jobMore={0}", _jobMore.ToJsonString());
-
         // Retrieve custom message or use default
-        var message = _jobMore.GetString("message") ?? "Hello from DummyAction!";
+        var message = jobMore.GetString("message") ?? "Hello from DummyAction!";
         Console.WriteLine("DummyAction.ExecAsync: {0} at {1}", message, DateTime.Now);
 
-        return Task.CompletedTask; // No async work here, so return completed        return Task.CompletedTask; // No async work here, so return completed task
+        return Task.CompletedTask; // No async work here, so return completed
     }
 }

@@ -8,6 +8,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-        <PackageReference Include="WJb" Version="0.11.1-beta1" />
+        <PackageReference Include="WJb" Version="0.12.1-beta" />
     </ItemGroup>
 </Project>
