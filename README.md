@@ -8,9 +8,10 @@ This repository contains **ready-to-run examples** demonstrating how to use WJb 
 
 ## 📚 Samples Overview
 
-| Sample Name       | Description                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| **MinWJbApp**     | Minimal console app using `AddWJb()` extension, one custom action, and job enqueue.    |
+| Sample Name       | Description                                                                                     |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| **MinWJbApp**     | Minimal console app using `AddWJb()` extension, one custom action, and job enqueue.          |
+| **CronWJbApp**    | Console app demonstrating scheduled jobs using cron expressions with `AddWJb()` and hosted service. |
 
 ***
 
