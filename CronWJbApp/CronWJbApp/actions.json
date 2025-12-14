@@ -1,0 +1,8 @@
+{
+  "Dummy": {
+    "type": "DummyAction, CronWJbApp",
+    "more": {
+      "cron": "* * * * *"
+    }
+  }
+}
