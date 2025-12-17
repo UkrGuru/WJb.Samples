@@ -1,40 +1,53 @@
-﻿
+
 # WJb Demos
 
 A curated collection of **20 minimal, focused demos** for the `WJb` package—showing scheduling, queues, APIs, UI integrations, reporting, and more.
 
 > **Naming convention:** `FeatureWJb` (e.g., `CronWJb`, `BlazorWJb`) for clarity and consistency.
 
-## 📚 Demo Index
+## ✅ **Basics (Getting Started)**
 
-| # | Demo | Focus |
-|---|------|-------|
-| 1 | `1stWJb` | Minimal console app; first job execution |
-| 2 | `ConfigWJb` | Configuration-driven job settings |
-| 3 | `SqlWJb` | Execute SQL via WJb (using `UkrGuru.Sql`) |
-| 4 | `QueueWJb` | Queue processing |
-| 5 | `TimerWJb` | Scheduled timers / delays |
-| 6 | `CronWJb` | Cron-based scheduling |
-| 7 | `EventWJb` | Custom event triggers |
-| 8 | `ApiWJb` | Trigger via REST API |
-| 9 | `WebhookWJb` | External webhooks |
-|10 | `RetryWJb` | Retry policies |
-|11 | `BlazorWJb` | Blazor UI integration |
-|12 | `MvcWJb` | ASP.NET MVC |
-|13 | `WinFormsWJb` | Desktop app |
-|14 | `WorkerWJb` | .NET Worker service |
-|15 | `DIWJb` | Dependency Injection patterns |
-|16 | `FileWJb` | File processing |
-|17 | `MailWJb` | Email sending |
-|18 | `ReportWJb` | Reporting and delivery |
-|19 | `ParallelWJb` | Concurrent jobs |
-|20 | `SecureWJb` | AuthN/AuthZ around job execution |
+1.  [**1stWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/1stWJb) – Minimal console app, first job execution.
+2.  **ConfigWJb** – Using configuration for job settings.
+3.  **SqlWJb** – Execute SQL commands via WJb.
+4.  **QueueWJb** – Simple queue processing.
+5.  **TimerWJb** – Scheduled jobs using delays.
 
-> Full roadmap in `docs/ROADMAP.md`
+***
+
+## ✅ **Scheduling & Triggers**
+
+6.  **CronWJb** – Cron-based scheduling.
+7.  **EventWJb** – Trigger jobs on custom events.
+8.  **ApiWJb** – Trigger jobs via REST API.
+9.  **WebhookWJb** – Execute jobs from external webhooks.
+10. **RetryWJb** – Implement retry logic for failed jobs.
+
+***
+
+## ✅ **Integration**
+
+11. **BlazorWJb** – Blazor UI for job management.
+12. **MvcWJb** – ASP.NET MVC integration.
+13. **WinFormsWJb** – Desktop app demo.
+14. **WorkerWJb** – Background service in .NET Worker.
+15. **DIWJb** – Using Dependency Injection with WJb.
+
+***
+
+## ✅ **Advanced Features**
+
+16. **FileWJb** – File upload & processing jobs.
+17. **MailWJb** – Sending emails via WJb.
+18. **ReportWJb** – Generate and deliver reports.
+19. **ParallelWJb** – Run multiple jobs concurrently.
+20. **SecureWJb** – Authentication & authorization for job execution.
+
+***
 
 ## 🔧 Prerequisites
 
-- .NET SDK (>= 8.0)
+- .NET SDK (>= 10.0)
 - SQL Server (LocalDB or remote)
 - Packages:
   - `WJb`
@@ -43,11 +56,13 @@ A curated collection of **20 minimal, focused demos** for the `WJb` package—sh
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/<your-org>/WJb-Demos.git
-cd WJb-Demos
+git clone https://github.com/UkrGuru/WJb.Samples.git
+cd WJb.Samples
 
 # Pick a demo
-cd src/1stWJb/src
+cd src/1stWJb
 
-## Restore & run
+# Restore & run
 dotnet restore
+dotnet run
+```
