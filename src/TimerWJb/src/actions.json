@@ -1,0 +1,9 @@
+{
+  "MyTimerAction": {
+    "Type": "MyTimerAction, TimerWJb",
+    "More": {
+      "intervalMs": 1000,
+      "items": [ "A", "B", "C" ]
+    }
+  }
+}
