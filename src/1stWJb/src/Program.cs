@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Nodes;
 using WJb;
@@ -18,7 +19,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddWJb(
             configureSettings: opts =>
             {
-                // Limit concurrent job execution to 2
+                // Limit concurrent job execution to 1
                 // (applies to the internal job processor / worker pool)
                 opts["MaxParallelJobs"] = 1;
             },
@@ -30,9 +31,7 @@ var host = Host.CreateDefaultBuilder(args)
                     // Fully qualified type name so the runtime can instantiate it via DI.
                     type: typeof(MyAction).AssemblyQualifiedName!,
 
-                    // Default payload for this action. Fields here are merged with the job payload:
-                    // - If a field is present in both defaults and job, the job's value overrides.
-                    // - If a field is only in defaults, it remains available to the action.
+                    // Default payload for this action.
                     more: new { name = "Oleksandr" }
                 );
             });
@@ -42,12 +41,10 @@ var host = Host.CreateDefaultBuilder(args)
 var jobs = host.Services.GetRequiredService<IJobProcessor>();
 
 // 1) Enqueue a job using ONLY defaults -> prints "Oleksandr"
-// Because jobMore is null, the default "More" from the action map is used.
-await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" });
+await jobs.EnqueueJobAsync("MyAction", null);
 
 // 2) Enqueue a job that overrides default -> prints "Viktor"
-// Provided jobMore overrides the "name" field in the mapped defaults.
-await jobs.EnqueueJobAsync("MyAction", null, Priority.High);
+await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" }, Priority.High);
 
 // Start the hosted service infrastructure (e.g., workers, background processing).
 await host.RunAsync();
@@ -80,7 +77,6 @@ public class MyAction : IAction
     /// </remarks>
     public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
-
         // Resolve "name" from payload; if absent, use the local fallback
         var name = jobMore.GetString("name") ?? _name;
 

@@ -1,41 +1,53 @@
-﻿# WJb.Samples
-[![Nuget](https://img.shields.io/nuget/v/WJb)](https://www.nuget.org/packages/WJb/)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-yellow.svg)](https://www.paypal.com/donate/?hosted_button_id=BPUF3H86X96YN)
+﻿
+# WJb Demos
 
-This repository contains **ready-to-run examples** demonstrating how to use WJb — a lightweight, priority-aware background job runner for .NET.
+A curated collection of **20 minimal, focused demos** for the `WJb` package—showing scheduling, queues, APIs, UI integrations, reporting, and more.
 
-***
+> **Naming convention:** `FeatureWJb` (e.g., `CronWJb`, `BlazorWJb`) for clarity and consistency.
 
-## 📚 Samples Overview
+## 📚 Demo Index
 
-| Sample Name       | Description                                                                                     |
-| ----------------- | --------------------------------------------------------------------------------------------- |
-| **MinWJbApp**     | Minimal console app using `AddWJb()` extension, one custom action, and job enqueue.          |
-| **CronWJbApp**    | Console app demonstrating scheduled jobs using cron expressions with `AddWJb()` and hosted service. |
+| # | Demo | Focus |
+|---|------|-------|
+| 1 | `1stWJb` | Minimal console app; first job execution |
+| 2 | `ConfigWJb` | Configuration-driven job settings |
+| 3 | `SqlWJb` | Execute SQL via WJb (using `UkrGuru.Sql`) |
+| 4 | `QueueWJb` | Queue processing |
+| 5 | `TimerWJb` | Scheduled timers / delays |
+| 6 | `CronWJb` | Cron-based scheduling |
+| 7 | `EventWJb` | Custom event triggers |
+| 8 | `ApiWJb` | Trigger via REST API |
+| 9 | `WebhookWJb` | External webhooks |
+|10 | `RetryWJb` | Retry policies |
+|11 | `BlazorWJb` | Blazor UI integration |
+|12 | `MvcWJb` | ASP.NET MVC |
+|13 | `WinFormsWJb` | Desktop app |
+|14 | `WorkerWJb` | .NET Worker service |
+|15 | `DIWJb` | Dependency Injection patterns |
+|16 | `FileWJb` | File processing |
+|17 | `MailWJb` | Email sending |
+|18 | `ReportWJb` | Reporting and delivery |
+|19 | `ParallelWJb` | Concurrent jobs |
+|20 | `SecureWJb` | AuthN/AuthZ around job execution |
 
-***
+> Full roadmap in `docs/ROADMAP.md`
 
-## ✅ How to Run a Sample
+## 🔧 Prerequisites
 
-1.  Clone the repo:
-    ```bash
-    git clone https://github.com/UkrGuru/WJb.Samples.git
-    cd WJb.Samples
-    ```
+- .NET SDK (>= 8.0)
+- SQL Server (LocalDB or remote)
+- Packages:
+  - `WJb`
+  - `UkrGuru.Sql` (preferred over EF Core, used across SQL demos)
 
-2.  Navigate to a sample folder:
-    ```bash
-    cd MinWJbApp
-    ```
+## 🚀 Getting Started
 
-3.  Restore and run:
-    ```bash
-    dotnet restore
-    dotnet run
-    ```
+```bash
+git clone https://github.com/<your-org>/WJb-Demos.git
+cd WJb-Demos
 
-***
+# Pick a demo
+cd src/1stWJb/src
 
-## License
-
-MIT License. See LICENSE for details.
+## Restore & run
+dotnet restore
