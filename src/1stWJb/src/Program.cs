@@ -1,11 +1,26 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Text.Json.Nodes;
 using WJb;
 using WJb.Extensions;
 
 var host = Host.CreateDefaultBuilder(args)
+        .ConfigureLogging(logging =>
+        {
+            // Optional: replace default providers to have full control
+            logging.ClearProviders();
+
+            logging.AddSimpleConsole(opt =>
+            {
+                opt.SingleLine = true;
+            });
+
+            // Hide logs from this category
+            logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
+            logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
+        })
     // Configure DI container and hosted environment
     .ConfigureServices(services =>
     {
