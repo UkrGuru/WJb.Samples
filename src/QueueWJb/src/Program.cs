@@ -1,9 +1,81 @@
-using System;
 
-class Program
-{
-    static void Main(string[] args)
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Text.Json.Nodes;
+using WJb;
+using WJb.Extensions;
+
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureLogging(logging =>
     {
-        Console.WriteLine("Hello from demo!");
+        // Optional: replace default providers to have full control
+        logging.ClearProviders();
+
+        logging.AddSimpleConsole(opt =>
+        {
+            opt.SingleLine = true;
+            opt.TimestampFormat = "HH:mm:ss ";
+        });
+
+        // Hide logs from this category
+        logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
+
+        // Optional: also silence generic hosting noise
+        logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
+    })
+    .ConfigureServices(services =>
+    {
+        // Register action
+        services.AddTransient<MyQueueAction>();
+
+        // Register WJb with actions map via DI
+        var actions = new Dictionary<string, ActionItem>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["MyQueueAction"] = new ActionItem(
+                type: typeof(MyQueueAction).AssemblyQualifiedName!,
+                more: new { items = new[] { "A", "B", "C" } }
+            )
+        };
+        services.AddSingleton(actions);
+        services.AddWJb();
+    })
+    .Build();
+
+var jobs = host.Services.GetRequiredService<IJobProcessor>();
+
+// 1) Use defaults → processes A, B, C
+await jobs.EnqueueJobAsync("MyQueueAction", null);
+
+// 2) Override defaults → processes X, Y
+await jobs.EnqueueJobAsync("MyQueueAction", new { items = new[] { "X", "Y" } }, Priority.High);
+
+await host.RunAsync();
+
+public class MyQueueAction : IAction
+{
+    private readonly ILogger<MyQueueAction> _logger;
+    public MyQueueAction(ILogger<MyQueueAction> logger) => _logger = logger;
+
+    public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
+    {
+        var items = jobMore.GetArray("items");
+        if (items is null || items.Count == 0)
+        {
+            _logger.LogInformation("QueueWJb: No items to process.");
+            return Task.CompletedTask;
+        }
+
+        foreach (var node in items)
+        {
+            if (stoppingToken.IsCancellationRequested) break;
+            var value = node?.GetValue<string>();
+            _logger.LogInformation("Processing item: {Item}", value);
+            // Simulate work per item
+            Thread.Sleep(100);
+        }
+
+        _logger.LogInformation("QueueWJb: Done.");
+        return Task.CompletedTask;
     }
 }
