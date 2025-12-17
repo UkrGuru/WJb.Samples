@@ -20,8 +20,6 @@ var host = Host.CreateDefaultBuilder(args)
 
         // Hide logs from this category
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
-
-        // Optional: also silence generic hosting noise
         logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
     })
     .ConfigureServices(services =>

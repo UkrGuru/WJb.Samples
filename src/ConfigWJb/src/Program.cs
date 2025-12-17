@@ -46,7 +46,6 @@ await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" }, Priority.High);
 
 await host.RunAsync();
 
-
 public class MyAction : IAction
 {
     private readonly string _fallback = "World";

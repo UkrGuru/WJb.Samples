@@ -1,6 +1,6 @@
 # 1stWJb — WJb Demo (NuGet)
 
-Minimal console demo using the **WJb** NuGet package (`0.13.1-beta`).
+Minimal console demo using the **WJb** NuGet package.
 
 ## Run
 

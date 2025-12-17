@@ -1,6 +1,6 @@
 # TimerWJb
 
-Scheduled jobs using delays (PeriodicTimer) with UkrGuru.WJb.
+Scheduled jobs using delays (PeriodicTimer) using the **WJb** NuGet package.
 
 ## Run
 ```bash

@@ -11,7 +11,7 @@ A curated collection of **20 minimal, focused demos** for the `WJb` package—sh
 2.  [**ConfigWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/ConfigWJb) – Using configuration for job settings.
 3.  **SqlWJb** – Execute SQL commands via WJb.
 4.  [**QueueWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/QueueWJb) – Simple queue processing.
-5.  **TimerWJb** – Scheduled jobs using delays.
+5.  [**TimerWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/TimerWJb) – Scheduled jobs using delays.
 
 ***
 
