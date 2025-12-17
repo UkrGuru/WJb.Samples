@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="src/1stWJb/src/1stWJb.csproj" />
-  <Project Path="src/ConfigWJb/src/ConfigWJb.csproj" />
-  <Project Path="src/CronWJb/src/CronWJb.csproj" />
-  <Project Path="src/QueueWJb/src/QueueWJb.csproj" />
-  <Project Path="src/TimerWJb/src/TimerWJb.csproj" />
-</Solution>

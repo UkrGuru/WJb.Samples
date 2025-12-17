@@ -1,0 +1,16 @@
+{
+  "OnFileCreated": {
+    "Type": "DummyAction, EventWJb",
+    "More": {
+      "message": "File created event",
+      "origin": "fsw"
+    }
+  },
+  "OnBusinessEvent": {
+    "Type": "DummyAction, EventWJb",
+    "More": {
+      "message": "Business event handled",
+      "origin": "bus"
+    }
+  }
+}
