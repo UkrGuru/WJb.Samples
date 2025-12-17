@@ -13,15 +13,13 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((ctx, services) =>
     {
-        // --- Load actions from actions.json ---
+        // Load actions from actions.json
         var json = File.ReadAllText("actions.json");
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-        // Deserialize to dictionary: { "ActionName": ActionItem }
         var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
-                      ?? throw new InvalidOperationException("Failed to deserialize actions.json into ActionItem dictionary.");
+            ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
-        // Configure WJb and inject the loaded actions
+        // Register WJb with loaded actions
         services.AddWJb(actions: actions);
     })
     .Build();
