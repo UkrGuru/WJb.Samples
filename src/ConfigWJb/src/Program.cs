@@ -1,9 +1,47 @@
-using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using WJb;
+using WJb.Extensions;
 
-class Program
-{
-    static void Main(string[] args)
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration(cfg =>
     {
-        Console.WriteLine("Hello from demo!");
+        cfg.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+    })
+    .ConfigureServices((ctx, services) =>
+    {
+        // --- Load actions from actions.json ---
+        var json = File.ReadAllText("actions.json");
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Deserialize to dictionary: { "ActionName": ActionItem }
+        var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
+                      ?? throw new InvalidOperationException("Failed to deserialize actions.json into ActionItem dictionary.");
+
+        // Configure WJb and inject the loaded actions
+        services.AddWJb(actions: actions);
+    })
+    .Build();
+
+var jobs = host.Services.GetRequiredService<IJobProcessor>();
+
+await jobs.EnqueueJobAsync("MyAction", null);
+await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" }, Priority.High);
+
+await host.RunAsync();
+
+
+public class MyAction : IAction
+{
+    private readonly string _fallback = "World";
+
+    public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
+    {
+        var name = jobMore?.GetString("name") ?? _fallback;
+        Console.WriteLine($"Hello {name}!");
+        return Task.CompletedTask;
     }
 }
