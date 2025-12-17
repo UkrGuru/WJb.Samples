@@ -17,7 +17,7 @@ A curated collection of **20 minimal, focused demos** for the `WJb` package—sh
 
 ## ✅ **Scheduling & Triggers**
 
-6.  **CronWJb** – Cron-based scheduling.
+6.  [**CronWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/CronWJb) – Cron-based scheduling.
 7.  **EventWJb** – Trigger jobs on custom events.
 8.  **ApiWJb** – Trigger jobs via REST API.
 9.  **WebhookWJb** – Execute jobs from external webhooks.

@@ -1,0 +1,18 @@
+{
+  "HelloEveryMinute": {
+    "Type": "DummyAction, CronWJb",
+    "More": {
+      "cron": "*/1 * * * *",
+      "priority": 2,
+      "message": "Minute tick ✅"
+    }
+  },
+  "Hello9to5Weekdays": {
+    "Type": "DummyAction, CronWJb",
+    "More": {
+      "cron": "*/3 9-21 * * 1-5",
+      "priority": 3,
+      "message": "Working hours ping (every 5 minutes, Mon–Fri)"
+    }
+  }
+}
