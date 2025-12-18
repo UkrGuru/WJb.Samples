@@ -2,14 +2,6 @@
 
 Minimal console demo using the **WJb** NuGet package.
 
-## Run
-
-```bash
-cd src
-dotnet restore
-dotnet run
-```
-
 ## What it does
 - Registers your custom action `MyAction` (implements `IAction`).
 - Configures WJb with a default payload (`more: { name: "Oleksandr" }`).

@@ -7,7 +7,7 @@ using WJb;
 using WJb.Extensions;
 
 var host = Host.CreateDefaultBuilder(args)
-        .ConfigureLogging(logging =>
+    .ConfigureLogging(logging =>
         {
             // Optional: replace default providers to have full control
             logging.ClearProviders();

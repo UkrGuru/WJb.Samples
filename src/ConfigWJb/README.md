@@ -12,16 +12,6 @@ A minimal console demo showing how to configure **WJb** via `appsettings.json` f
 
 ***
 
-## ▶️ Run
-
-```bash
-cd src
-dotnet restore
-dotnet run
-```
-
-***
-
 ## 🗂 Files
 
 *   **appsettings.json** — contains WJb settings like `MaxParallelJobs`.

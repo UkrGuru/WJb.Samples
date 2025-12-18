@@ -1,0 +1,9 @@
+{
+  "OnApiEvent": {
+    "Type": "DummyAction, ApiWJb",
+    "More": {
+      "message": "Event from REST API",
+      "origin": "api"
+    }
+  }
+}

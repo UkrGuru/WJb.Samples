@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="1stWJb/1stWJb.csproj" />
+  <Project Path="ConfigWJb/ConfigWJb.csproj" />
+  <Project Path="CronWJb/CronWJb.csproj" />
+  <Project Path="EventWJb/EventWJb.csproj" />
+  <Project Path="QueueWJb/QueueWJb.csproj" />
+  <Project Path="SqlWJb/SqlWJb.csproj" />
+  <Project Path="TimerWJb/TimerWJb.csproj" />
+</Solution>
