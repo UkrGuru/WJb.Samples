@@ -85,12 +85,9 @@ public class MySqlAction(IDbService db, ILogger<MySqlAction> logger) : IAction
 
     public async Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
-        // Normalize payload
-        var more = jobMore ?? new JsonObject();
-
         // Read inputs
-        var tsql = more.GetString("tsql") ?? throw new InvalidOperationException("TSql is required.");
-        var data = more.GetString("data");
+        var tsql = jobMore.GetString("tsql") ?? throw new InvalidOperationException("TSql is required.");
+        var data = jobMore.GetString("data");
 
         var total = await _db.ExecAsync<decimal>(tsql, data);
         _logger.LogInformation("Order Total: {Result}", total);
