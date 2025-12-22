@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="1stWJb/1stWJb.csproj" />
+  <Project Path="ApiWJb/ApiWJb.csproj" />
   <Project Path="ConfigWJb/ConfigWJb.csproj" />
   <Project Path="CronWJb/CronWJb.csproj" />
   <Project Path="EventWJb/EventWJb.csproj" />

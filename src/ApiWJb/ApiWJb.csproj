@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="WJb" Version="0.13.1-beta" />
+    <PackageReference Include="WJb" Version="0.14.0-beta" />
   </ItemGroup>
 </Project>
