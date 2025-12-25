@@ -15,7 +15,7 @@ var host = Host.CreateDefaultBuilder(args)
         logging.AddSimpleConsole(opt =>
         {
             opt.SingleLine = true;
-            opt.TimestampFormat = "HH:mm:ss ";
+            opt.TimestampFormat = "HH:mm:ss.fff ";
         });
 
         // Hide logs from this category
@@ -50,10 +50,9 @@ await jobs.EnqueueJobAsync("MyQueueAction", new { items = new[] { "X", "Y" } }, 
 
 await host.RunAsync();
 
-public class MyQueueAction : IAction
+public class MyQueueAction(ILogger<MyQueueAction> logger) : IAction
 {
-    private readonly ILogger<MyQueueAction> _logger;
-    public MyQueueAction(ILogger<MyQueueAction> logger) => _logger = logger;
+    private readonly ILogger<MyQueueAction> _logger = logger;
 
     public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
@@ -67,9 +66,10 @@ public class MyQueueAction : IAction
         foreach (var node in items)
         {
             if (stoppingToken.IsCancellationRequested) break;
+
             var value = node?.GetValue<string>();
             _logger.LogInformation("Processing item: {Item}", value);
-            // Simulate work per item
+
             Thread.Sleep(100);
         }
 

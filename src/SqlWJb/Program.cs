@@ -14,13 +14,8 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureLogging(logging =>
     {
-        // Optional: replace default providers to have full control
         logging.ClearProviders();
-
-        logging.AddSimpleConsole(opt =>
-        {
-            opt.SingleLine = true;
-        });
+        logging.AddSimpleConsole(opt => { opt.SingleLine = true; opt.TimestampFormat = "HH:mm:ss.fff "; });
 
         // Hide logs from this category
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
@@ -28,23 +23,30 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((ctx, services) =>
     {
-        // Logging
-        services.AddLogging(b => b.AddSimpleConsole(opt => { opt.SingleLine = true; opt.TimestampFormat = "HH:mm:ss "; }));
-
         // UkrGuru.Sql setup: register SqlClient with connection string
         var conn = ctx.Configuration.GetConnectionString("DefaultConnection")
                    ?? throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection");
         services.AddSql(conn, true);
 
         // Register action
-        services.AddTransient<MySqlAction>();
+        services.AddTransient<SqlAction>();
 
         // Register WJb with actions map directly in DI (Dictionary<string, ActionItem>)
         var actions = new Dictionary<string, ActionItem>(StringComparer.OrdinalIgnoreCase)
         {
-            ["MySqlAction"] = new ActionItem(
-                type: typeof(MySqlAction).AssemblyQualifiedName!,
-                more: null
+            ["CalcOrderTotalAction"] = new ActionItem(
+                type: typeof(SqlAction).AssemblyQualifiedName!,
+                more: new
+                {
+                    tsql = """
+                        SELECT SUM(quantity * price)
+                        FROM OPENJSON(@Data, '$.items')
+                        WITH (
+                            quantity int    '$.quantity',
+                            price    decimal(8,2) '$.price'
+                        )
+                        """
+                }
             )
         };
         services.AddSingleton(actions);
@@ -54,15 +56,8 @@ var host = Host.CreateDefaultBuilder(args)
 
 var jobs = host.Services.GetRequiredService<IJobProcessor>();
 
-await jobs.EnqueueJobAsync("MySqlAction", new {
-    tsql = """
-    SELECT CAST(SUM(TRY_CONVERT(decimal(18,4), quantity) * TRY_CONVERT(decimal(18,4), price)) AS decimal(18,2))
-    FROM OPENJSON(@Data, '$.items')
-    WITH (
-        quantity int    '$.quantity',
-        price    decimal(18,4) '$.price'
-    )
-    """,
+var order = new
+{
     data = """
     {
       "orderId": "12345",
@@ -74,14 +69,15 @@ await jobs.EnqueueJobAsync("MySqlAction", new {
       ]
     }
     """
-});
+};
+await jobs.EnqueueJobAsync("CalcOrderTotalAction", order);
 
 await host.RunAsync();
 
-public class MySqlAction(IDbService db, ILogger<MySqlAction> logger) : IAction
+public class SqlAction(IDbService db, ILogger<SqlAction> logger) : IAction
 {
     private readonly IDbService _db = db;
-    private readonly ILogger<MySqlAction> _logger = logger;
+    private readonly ILogger<SqlAction> _logger = logger;
 
     public async Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
@@ -89,7 +85,7 @@ public class MySqlAction(IDbService db, ILogger<MySqlAction> logger) : IAction
         var tsql = jobMore.GetString("tsql") ?? throw new InvalidOperationException("TSql is required.");
         var data = jobMore.GetString("data");
 
-        var total = await _db.ExecAsync<decimal>(tsql, data);
+        var total = await _db.ExecAsync<object>(tsql, data);
         _logger.LogInformation("Order Total: {Result}", total);
     }
 }
