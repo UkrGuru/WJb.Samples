@@ -48,14 +48,11 @@ var host = Host.CreateDefaultBuilder(args)
 
 await host.RunAsync();
 
-public sealed class TimerEnqueuer : BackgroundService
+public sealed class TimerEnqueuer(ILogger<TimerEnqueuer> logger, IJobProcessor jobs, IReadOnlyDictionary<string, ActionItem> actions) : BackgroundService
 {
-    private readonly ILogger<TimerEnqueuer> _logger;
-    private readonly IJobProcessor _jobs;
-    private readonly IReadOnlyDictionary<string, ActionItem> _actions;
-
-    public TimerEnqueuer(ILogger<TimerEnqueuer> logger, IJobProcessor jobs, IReadOnlyDictionary<string, ActionItem> actions)
-    { _logger = logger; _jobs = jobs; _actions = actions; }
+    private readonly ILogger<TimerEnqueuer> _logger = logger;
+    private readonly IJobProcessor _jobs = jobs;
+    private readonly IReadOnlyDictionary<string, ActionItem> _actions = actions;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -77,15 +74,14 @@ public sealed class TimerEnqueuer : BackgroundService
         while (await timer.WaitForNextTickAsync(ct))
         {
             _logger.LogInformation("Enqueue: {Code} (period={Period}ms)", code, (int)period.TotalMilliseconds);
-            await _jobs.EnqueueJobAsync(code, null, Priority.Normal);
+            await _jobs.EnqueueJobAsync(code, new { priority = Priority.Normal.ToString() } );
         }
     }
 }
 
-public class MyTimerAction : IAction
+public class MyTimerAction(ILogger<MyTimerAction> logger) : IAction
 {
-    private readonly ILogger<MyTimerAction> _logger;
-    public MyTimerAction(ILogger<MyTimerAction> logger) => _logger = logger;
+    private readonly ILogger<MyTimerAction> _logger = logger;
 
     public async Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {

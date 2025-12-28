@@ -68,17 +68,11 @@ public sealed class DummyAction(ILogger<DummyAction> logger) : IAction
 }
 
 // Hosted service: listens for JSON event files and enqueues jobs
-public sealed class FileEventListener : BackgroundService
+public sealed class FileEventListener(ILogger<FileEventListener> logger, IJobProcessor processor) : BackgroundService
 {
-    private readonly ILogger<FileEventListener> _logger;
-    private readonly IJobProcessor _processor;
+    private readonly ILogger<FileEventListener> _logger = logger;
+    private readonly IJobProcessor _processor = processor;
     private readonly string _eventsDir = Path.Combine(AppContext.BaseDirectory, "events");
-
-    public FileEventListener(ILogger<FileEventListener> logger, IJobProcessor processor)
-    {
-        _logger = logger;
-        _processor = processor;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -141,18 +135,15 @@ public sealed class FileEventListener : BackgroundService
                         _logger.LogWarning("Event file {file} missing 'code'/'actionCode'", path);
                         return;
                     }
-                    var prio = Priority.Normal;
-                    var pstr = moreNode.GetString("priority");
-                    if (int.TryParse(pstr, out var p)) prio = (Priority)p;
 
                     _logger.LogInformation("Enqueue {code} from file {file}", code, path);
-                    await _processor.EnqueueJobAsync(code, moreNode, prio, stoppingToken);
+                    await _processor.EnqueueJobAsync(code, moreNode, stoppingToken);
                 }
                 else
                 {
                     // Raw compact job string
                     _logger.LogInformation("Process raw job from file {file}", path);
-                    await _processor.ProcessJobAsync(text, Priority.Normal, stoppingToken);
+                    await _processor.ProcessJobAsync(text, stoppingToken);
                 }
                 return;
             }

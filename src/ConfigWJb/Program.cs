@@ -42,7 +42,7 @@ var host = Host.CreateDefaultBuilder(args)
 var jobs = host.Services.GetRequiredService<IJobProcessor>();
 
 await jobs.EnqueueJobAsync("MyAction", null);
-await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" }, Priority.High);
+await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor", priority = Priority.High.ToString() });
 
 await host.RunAsync();
 

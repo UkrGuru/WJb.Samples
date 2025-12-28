@@ -45,10 +45,10 @@ app.MapPost("/events", async (HttpContext http, IJobProcessor processor) =>
     var code = dto.Code ?? dto.ActionCode;
     if (string.IsNullOrWhiteSpace(code)) return Results.BadRequest(new { error = "'code' (or 'actionCode') is required" });
 
-    var more = dto.More ?? new JsonObject();
+    var more = dto.More ?? [];
     var prio = dto.Priority is int ip ? (Priority)ip : Priority.Normal;
 
-    await processor.EnqueueJobAsync(code, more, prio, http.RequestAborted);
+    await processor.EnqueueJobAsync(code, more, http.RequestAborted);
     return Results.Accepted($"/events/{Guid.NewGuid()}", new { enqueued = true, code, priority = (int)prio });
 });
 
@@ -58,7 +58,7 @@ app.MapPost("/jobs/compact", async (HttpContext http, IJobProcessor processor) =
     var dto = await http.Request.ReadFromJsonAsync<EventDto>();
     if (dto is null || string.IsNullOrWhiteSpace(dto.Code))
         return Results.BadRequest(new { error = "'code' is required" });
-    var job = await processor.CompactAsync(dto.Code!, dto.More, http.RequestAborted);
+    var job = await processor.CompactAsync(dto.Code!, dto.More ?? [], http.RequestAborted);
     return Results.Ok(new { job });
 });
 
@@ -68,9 +68,8 @@ app.MapPost("/jobs/process", async (HttpContext http, IJobProcessor processor) =
     var dto = await http.Request.ReadFromJsonAsync<ProcessDto>();
     if (dto is null || string.IsNullOrWhiteSpace(dto.Job))
         return Results.BadRequest(new { error = "'job' is required" });
-    var prio = dto.Priority is int ip ? (Priority)ip : Priority.Normal;
-    await processor.ProcessJobAsync(dto.Job!, prio, http.RequestAborted);
-    return Results.Ok(new { processed = true, priority = (int)prio });
+    await processor.ProcessJobAsync(dto.Job!, http.RequestAborted);
+    return Results.Ok(new { processed = true });
 });
 
 app.Lifetime.ApplicationStarted.Register(() =>
