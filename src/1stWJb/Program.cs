@@ -59,7 +59,7 @@ var jobs = host.Services.GetRequiredService<IJobProcessor>();
 await jobs.EnqueueJobAsync("MyAction", null);
 
 // 2) Enqueue a job that overrides default -> prints "Viktor"
-await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor", priority = Priority.High.ToString() } );
+await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" }, Priority.High);
 
 // Start the hosted service infrastructure (e.g., workers, background processing).
 await host.RunAsync();

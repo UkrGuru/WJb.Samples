@@ -3,6 +3,7 @@
     "Type": "DummyAction, CronWJb",
     "More": {
       "cron": "*/1 * * * *",
+      "priority": "ASAP",
       "message": "Minute tick ✅"
     }
   },
@@ -10,6 +11,7 @@
     "Type": "DummyAction, CronWJb",
     "More": {
       "cron": "*/3 9-21 * * 1-5",
+      "priority": "High",
       "message": "Working hours ping (every 5 minutes, Mon–Fri)"
     }
   }

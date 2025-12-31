@@ -46,7 +46,7 @@ var jobs = host.Services.GetRequiredService<IJobProcessor>();
 await jobs.EnqueueJobAsync("MyQueueAction", new JsonObject() );
 
 // 2) Override defaults → processes X, Y
-await jobs.EnqueueJobAsync("MyQueueAction", new { items = new[] { "X", "Y" }, priority = Priority.High.ToString() });
+await jobs.EnqueueJobAsync("MyQueueAction", new { items = new[] { "X", "Y" } }, Priority.High);
 
 await host.RunAsync();
 

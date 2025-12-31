@@ -48,8 +48,8 @@ app.MapPost("/events", async (HttpContext http, IJobProcessor processor) =>
     var more = dto.More ?? [];
     var prio = dto.Priority is int ip ? (Priority)ip : Priority.Normal;
 
-    await processor.EnqueueJobAsync(code, more, http.RequestAborted);
-    return Results.Accepted($"/events/{Guid.NewGuid()}", new { enqueued = true, code, priority = (int)prio });
+    await processor.EnqueueJobAsync(code, more, prio, http.RequestAborted);
+    return Results.Accepted($"/events/{Guid.NewGuid()}", new { enqueued = true, code });
 });
 
 // POST /jobs/compact { code, more? } -> returns compact string
@@ -68,7 +68,7 @@ app.MapPost("/jobs/process", async (HttpContext http, IJobProcessor processor) =
     var dto = await http.Request.ReadFromJsonAsync<ProcessDto>();
     if (dto is null || string.IsNullOrWhiteSpace(dto.Job))
         return Results.BadRequest(new { error = "'job' is required" });
-    await processor.ProcessJobAsync(dto.Job!, http.RequestAborted);
+    await processor.ProcessJobAsync(dto.Job!, stoppingToken: http.RequestAborted);
     return Results.Ok(new { processed = true });
 });
 
