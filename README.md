@@ -7,21 +7,21 @@ A curated collection of **20 minimal, focused demos** for the `WJb` package—sh
 
 ## ✅ **Basics (Getting Started)**
 
-1.  [**1stWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/1stWJb) – Minimal console app, first job execution.
-2.  [**ConfigWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/ConfigWJb) – Using configuration for job settings.
-3.  [**SqlWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/SqlWJb) – Execute SQL commands via WJb.
-4.  [**QueueWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/QueueWJb) – Simple queue processing.
-5.  [**TimerWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/TimerWJb) – Scheduled jobs using delays.
+1. [**1stWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/1stWJb) – Minimal console app, first job execution.
+2. [**ConfigWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/ConfigWJb) – Using configuration for job settings.
+3. [**SqlWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/SqlWJb) – Execute SQL commands via WJb.
+4. [**QueueWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/QueueWJb) – Simple queue processing.
+5. [**TimerWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/TimerWJb) – Scheduled jobs using delays.
+6. [**LogWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/LogWJb) – Custom `JobProcessor` that logs the full job lifecycle (Compacted → Queued → Expanded → Running → Completed/Failed).
 
 ***
 
 ## ✅ **Scheduling & Triggers**
 
-6.  [**CronWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/CronWJb) – Cron-based scheduling.
-7.  [**EventWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/EventWJb) – Trigger jobs on custom events.
-8.  **ApiWJb** – Trigger jobs via REST API.
-9.  **WebhookWJb** – Execute jobs from external webhooks.
-10. **RetryWJb** – Implement retry logic for failed jobs.
+7.  [**CronWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/CronWJb) – Cron-based scheduling.
+8.  [**EventWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/EventWJb) – Trigger jobs on custom events.
+9.  **ApiWJb** – Trigger jobs via REST API.
+10.  **WebhookWJb** – Execute jobs from external webhooks.
 
 ***
 
