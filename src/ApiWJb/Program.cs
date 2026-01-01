@@ -48,7 +48,8 @@ app.MapPost("/events", async (HttpContext http, IJobProcessor processor) =>
     var more = dto.More ?? [];
     var prio = dto.Priority is int ip ? (Priority)ip : Priority.Normal;
 
-    await processor.EnqueueJobAsync(code, more, prio, http.RequestAborted);
+    var job = await processor.CompactAsync(code, more, http.RequestAborted);
+    await processor.EnqueueJobAsync(job, prio, http.RequestAborted);
     return Results.Accepted($"/events/{Guid.NewGuid()}", new { enqueued = true, code });
 });
 

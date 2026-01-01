@@ -74,7 +74,7 @@ public sealed class TimerEnqueuer(ILogger<TimerEnqueuer> logger, IJobProcessor j
         while (await timer.WaitForNextTickAsync(ct))
         {
             _logger.LogInformation("Enqueue: {Code} (period={Period}ms)", code, (int)period.TotalMilliseconds);
-            await _jobs.EnqueueJobAsync(code, new { priority = Priority.Normal.ToString() } );
+            await _jobs.EnqueueJobAsync(await _jobs.CompactAsync(code));
         }
     }
 }

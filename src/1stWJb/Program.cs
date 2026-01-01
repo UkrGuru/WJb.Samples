@@ -56,10 +56,10 @@ var host = Host.CreateDefaultBuilder(args)
 var jobs = host.Services.GetRequiredService<IJobProcessor>();
 
 // 1) Enqueue a job using ONLY defaults -> prints "Oleksandr"
-await jobs.EnqueueJobAsync("MyAction", null);
+await jobs.EnqueueJobAsync(await jobs.CompactAsync("MyAction"));
 
 // 2) Enqueue a job that overrides default -> prints "Viktor"
-await jobs.EnqueueJobAsync("MyAction", new { name = "Viktor" }, Priority.High);
+await jobs.EnqueueJobAsync(await jobs.CompactAsync("MyAction", new { name = "Viktor" }), Priority.High);
 
 // Start the hosted service infrastructure (e.g., workers, background processing).
 await host.RunAsync();

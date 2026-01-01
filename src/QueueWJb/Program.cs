@@ -43,10 +43,10 @@ var host = Host.CreateDefaultBuilder(args)
 var jobs = host.Services.GetRequiredService<IJobProcessor>();
 
 // 1) Use defaults → processes A, B, C
-await jobs.EnqueueJobAsync("MyQueueAction", new JsonObject() );
+await jobs.EnqueueJobAsync(await jobs.CompactAsync("MyQueueAction"));
 
 // 2) Override defaults → processes X, Y
-await jobs.EnqueueJobAsync("MyQueueAction", new { items = new[] { "X", "Y" } }, Priority.High);
+await jobs.EnqueueJobAsync(await jobs.CompactAsync("MyQueueAction", new { items = new[] { "X", "Y" } }), Priority.High);
 
 await host.RunAsync();
 

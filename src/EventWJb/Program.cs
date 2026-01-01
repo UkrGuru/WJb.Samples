@@ -137,7 +137,8 @@ public sealed class FileEventListener(ILogger<FileEventListener> logger, IJobPro
                     }
 
                     _logger.LogInformation("Enqueue {code} from file {file}", code, path);
-                    await _processor.EnqueueJobAsync(code, moreNode, stoppingToken: stoppingToken);
+                    var job = await _processor.CompactAsync(code, moreNode, stoppingToken);
+                    await _processor.EnqueueJobAsync(job, stoppingToken: stoppingToken);
                 }
                 else
                 {

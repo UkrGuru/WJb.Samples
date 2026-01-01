@@ -70,7 +70,7 @@ var order = new
     }
     """
 };
-await jobs.EnqueueJobAsync("CalcOrderTotalAction", order);
+await jobs.EnqueueJobAsync(await jobs.CompactAsync("CalcOrderTotalAction", order));
 
 await host.RunAsync();
 
