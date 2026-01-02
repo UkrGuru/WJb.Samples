@@ -12,8 +12,8 @@ A curated collection of **20 minimal, focused demos** for the `WJb` package—sh
 * [**SqlWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/SqlWJb) – Execute SQL commands via WJb.
 * [**QueueWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/QueueWJb) – Simple queue processing.
 * [**TimerWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/TimerWJb) – Scheduled jobs using delays.
-* [**LogWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/LogWJb) – Custom `JobProcessor` that logs the full job lifecycle (Compacted → Queued → Expanded → Running → Completed/Failed).
-
+* [**LogWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/LogWJb) – Custom `LogJobProcessor` that logs the full job lifecycle (Compacted → Queued → Expanded → Running → Completed/Failed).
+* [**SqlQueueWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/SqlQueueWJb) – Custom `SqlJobProcessor` SQL-backed queue with background service, job history (WJbQueue + WJbHistory), and full lifecycle logging (Compacted → Queued → Expanded → Running → Completed/Failed).
 ***
 
 ## ✅ **Scheduling & Triggers**
