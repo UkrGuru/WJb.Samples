@@ -36,10 +36,10 @@ var host = Host.CreateDefaultBuilder(args)
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
         // Register WJb with loaded actions
-        services.AddWJb(actions: actions);
+        services.AddWJbActions(actions).AddWJbOther(jobScheduler: false);
 
-        // ALSO expose the actions map to DI for TimerEnqueuer
         services.AddSingleton<IReadOnlyDictionary<string, ActionItem>>(actions);
+
 
         // Periodic enqueuer that uses intervalMs from action defaults
         services.AddHostedService<TimerEnqueuer>();

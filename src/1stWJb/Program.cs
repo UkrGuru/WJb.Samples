@@ -1,4 +1,3 @@
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,20 +23,10 @@ var host = Host.CreateDefaultBuilder(args)
     // Configure DI container and hosted environment
     .ConfigureServices(services =>
     {
-        // Register your action (the handler class that implements IAction).
-        // Lifetime can be Transient (stateless, per-exec), Scoped, or Singleton as you prefer.
-        services.AddTransient<MyAction>();
-
         // Register WJb infrastructure:
         // - configureSettings: runtime tunables (e.g., parallelism, delays, etc.)
         // - configureActions: map of action codes to ActionItem (type + default More)
-        services.AddWJb(
-            configureSettings: opts =>
-            {
-                // Limit concurrent job execution to 1
-                // (applies to the internal job processor / worker pool)
-                opts["MaxParallelJobs"] = 1;
-            },
+        services.AddWJbActions(
             configureActions: map =>
             {
                 // Map an action code to its handler type and optional default "More" payload.
@@ -50,6 +39,7 @@ var host = Host.CreateDefaultBuilder(args)
                     more: new { name = "Oleksandr" }
                 );
             });
+        services.AddWJbOther(jobScheduler: false);
     })
     .Build();
 

@@ -37,11 +37,8 @@ services.AddWJb(actions: actions);
 
 ## ✅ Expected Output
 
-    info: WJb.JobProcessor[0]
-          JobProcessor started
-    info: Microsoft.Hosting.Lifetime[0]
-          Application started. Press Ctrl+C to shut down.
-    Hello Viktor!
-    Hello Oleksandr!
+info: WJb.JobProcessor[0] JobProcessor started
+Hello Viktor!
+Hello Oleksandr!
 
 ***

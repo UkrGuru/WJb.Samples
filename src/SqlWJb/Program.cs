@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -50,8 +51,7 @@ var host = Host.CreateDefaultBuilder(args)
                 }
             )
         };
-        services.AddSingleton(actions);
-        services.AddWJb(actions: actions);
+        services.AddWJbActions(actions).AddWJbOther(jobScheduler: false);
     })
     .Build();
 

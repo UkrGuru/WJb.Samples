@@ -35,8 +35,7 @@ var host = Host.CreateDefaultBuilder(args)
                 more: new { items = new[] { "A", "B", "C" } }
             )
         };
-        services.AddSingleton(actions);
-        services.AddWJb();
+        services.AddWJbActions(actions).AddWJbOther(jobScheduler:false);
     })
     .Build();
 

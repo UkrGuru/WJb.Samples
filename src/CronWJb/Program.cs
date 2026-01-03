@@ -31,20 +31,12 @@ var host = Host.CreateDefaultBuilder(args)
     {
 
         // Load actions from actions.json (simple & success)
-        var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "actions.json"));
+        var json = File.ReadAllText("actions.json");
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
-        // Register WJb with loaded actions
-        services.AddWJb(actions: actions);
-
-        services.Configure<Dictionary<string, object>>(cfg => { cfg["MaxParallelJobs"] = 2; });
-
-        // ALSO expose the actions map to DI for TimerEnqueuer
-        services.AddSingleton<IReadOnlyDictionary<string, ActionItem>>(actions);
-
-        services.AddHostedService<JobScheduler>();
+        services.AddWJbActions(actions).AddWJbOther(jobScheduler: true);
     })
     .Build();
 

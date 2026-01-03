@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,10 +21,10 @@ var host = Host.CreateDefaultBuilder(args)
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
         logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
     })
-    .ConfigureAppConfiguration(cfg =>
-    {
-        cfg.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-    })
+    //.ConfigureAppConfiguration(cfg =>
+    //{
+    //    cfg.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+    //})
     .ConfigureServices((ctx, services) =>
     {
         // Load actions from actions.json
@@ -35,13 +34,14 @@ var host = Host.CreateDefaultBuilder(args)
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
         // Register WJb with loaded actions
-        services.AddWJb(actions: actions);
+        services.AddWJbActions(actions).AddWJbOther(jobScheduler: false);
     })
     .Build();
 
 var jobs = host.Services.GetRequiredService<IJobProcessor>();
 
 await jobs.EnqueueJobAsync(await jobs.CompactAsync("MyAction"));
+
 await jobs.EnqueueJobAsync(await jobs.CompactAsync("MyAction", new { name = "Viktor"}), Priority.High);
 
 await host.RunAsync();
@@ -52,7 +52,7 @@ public class MyAction : IAction
 
     public Task ExecAsync(JsonObject? jobMore, CancellationToken stoppingToken)
     {
-        var name = jobMore?.GetString("name") ?? _fallback;
+        var name = jobMore.GetString("name") ?? _fallback;
         Console.WriteLine($"Hello {name}!");
         return Task.CompletedTask;
     }

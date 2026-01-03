@@ -28,7 +28,7 @@ var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(actions
     ?? new Dictionary<string, ActionItem>(StringComparer.OrdinalIgnoreCase);
 
 // WJb services
-builder.Services.AddWJb(actions: actions);
+builder.Services.AddWJbActions(actions).AddWJbOther();
 builder.Services.Configure<Dictionary<string, object>>(cfg => { cfg["MaxParallelJobs"] = 2; });
 
 // Minimal API
