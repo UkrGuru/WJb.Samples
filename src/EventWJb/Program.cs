@@ -33,7 +33,7 @@ var host = Host.CreateDefaultBuilder(args)
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
         // WJb + Processor settings
-        services.AddWJbActions(actions).AddWJbOther();
+        services.AddWJbActions(actions).AddWJbBase();
         services.Configure<Dictionary<string, object>>(cfg => { cfg["MaxParallelJobs"] = 2; });
 
         // Expose action map if needed by listeners

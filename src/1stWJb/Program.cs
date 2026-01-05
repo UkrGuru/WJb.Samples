@@ -39,7 +39,7 @@ var host = Host.CreateDefaultBuilder(args)
                     more: new { name = "Oleksandr" }
                 );
             });
-        services.AddWJbOther(jobScheduler: false);
+        services.AddWJbBase();
     })
     .Build();
 

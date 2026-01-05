@@ -36,7 +36,7 @@ var host = Host.CreateDefaultBuilder(args)
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
         // Register WJb with loaded actions
-        services.AddWJbActions(actions).AddWJbOther(jobScheduler: false);
+        services.AddWJbActions(actions).AddWJbBase();
 
         services.AddSingleton<IReadOnlyDictionary<string, ActionItem>>(actions);
 
