@@ -1,46 +1,44 @@
-﻿
-using LogWJb;
+﻿using LogWJb;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WJb;
+
+
 
 // Host setup
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
         logging.ClearProviders();
-
         logging.AddSimpleConsole(o =>
         {
             o.SingleLine = true;
-            //o.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff ";
         });
-
-        // Hide logs from this category
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
         logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
     })
     .ConfigureServices(services =>
     {
-        // register our demo ActionFactory
+        // 🔥 Required because jobProcessor=false suppresses queue registration
+        services.AddSingleton<IJobQueue, InMemoryJobQueue>();
+
+        // Register your ActionFactory
         services.AddSingleton<IActionFactory, DemoActionFactory>();
 
-        // register LogJobProcessor (BackgroundService + IJobProcessor)
-        services.AddSingleton<IJobProcessor, LogJobProcessor>();
-        services.AddHostedService(sp => (LogJobProcessor)sp.GetRequiredService<IJobProcessor>());
+        // Register your processor + hosted service
+        services.AddSingleton<LogJobProcessor>();
+        services.AddSingleton<IJobProcessor>(sp => sp.GetRequiredService<LogJobProcessor>());
+        services.AddHostedService(sp => sp.GetRequiredService<LogJobProcessor>());
     })
     .Build();
 
 await host.StartAsync();
 
-// Resolve processor for demo enqueues
+// Use processor
 var proc = host.Services.GetRequiredService<IJobProcessor>();
-
 var job = await proc.CompactAsync("SayHello", new { name = "Viktor" });
 await proc.EnqueueJobAsync(job, Priority.High);
 
-// Let background service drain queues
 await Task.Delay(1000);
-
 await host.StopAsync();

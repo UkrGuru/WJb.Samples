@@ -37,8 +37,10 @@ services.AddWJb(actions: actions);
 
 ## ✅ Expected Output
 
+```text
 info: WJb.JobProcessor[0] JobProcessor started
-Hello Viktor!
+Hello Viktor! 
 Hello Oleksandr!
+```
 
 ***

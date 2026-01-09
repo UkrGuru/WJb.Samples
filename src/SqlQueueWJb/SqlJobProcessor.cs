@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using UkrGuru.Sql;
@@ -8,15 +9,21 @@ using WJb.Extensions;
 namespace SqlQueueWJb;
 
 /// <summary>
-/// Logs the lifecycle messages you standardized, using only supported virtual hooks.
+/// SQL-backed job processor: persists queue entries and logs lifecycle,
+/// while delegating actual execution to base JobProcessor.
 /// </summary>
-public class SqlJobProcessor(ILogger<SqlJobProcessor> logger, IOptions<Dictionary<string, object>> options, IActionFactory actionFactory, IDbService db) :
-    JobProcessor(logger, options, actionFactory)
+public class SqlJobProcessor(
+    ILogger<SqlJobProcessor> logger,
+    IOptions<Dictionary<string, object>> options,
+    IActionFactory actionFactory,
+    IDbService db,
+    IJobQueue queue) // <-- NEW: required by JobProcessor in 0.22.0-beta
+    : JobProcessor(logger, options, actionFactory, queue) // <-- pass queue to base
 {
     private readonly ILogger<SqlJobProcessor> _logger = logger;
     private readonly IDbService _db = db;
 
-    // Compact → "Compacted"
+    // Compact → "Compacted" and persist job (returns JobId as string)
     public override async Task<string> CompactAsync(string actionCode, object? jobMore, CancellationToken stoppingToken = default)
     {
         var job = await base.CompactAsync(actionCode, jobMore, stoppingToken);
@@ -28,7 +35,7 @@ public class SqlJobProcessor(ILogger<SqlJobProcessor> logger, IOptions<Dictionar
         return jobId.ToString();
     }
 
-    // Enqueue (job) → "JobQueued"
+    // Enqueue (job) → mark Queued in DB, then enqueue into in-memory queue
     public override async Task EnqueueJobAsync(string job, Priority priority = Priority.Normal, CancellationToken stoppingToken = default)
     {
         if (int.TryParse(job, out var jobId))
@@ -41,14 +48,18 @@ public class SqlJobProcessor(ILogger<SqlJobProcessor> logger, IOptions<Dictionar
         _logger.LogInformation("Job Queued");
     }
 
-    // Expand → "Expanded"
+    // Expand → hydrate compacted JSON from DB using JobId
     public override async Task<(string Type, JsonObject More)> ExpandAsync(string job, CancellationToken stoppingToken = default)
     {
-        if (long.TryParse(job, out var jobId))
-        {
-            var codemore = await _db.ExecAsync<string>(WJbQueue.Get_CodeMore, jobId, cancellationToken: stoppingToken);
+        long jobId = 0;
 
-            if (!string.IsNullOrEmpty(codemore)) job = codemore;
+        if (long.TryParse(job, out var parsedId))
+        {
+            jobId = parsedId;
+
+            var codemore = await _db.ExecAsync<string>(WJbQueue.Get_CodeMore, jobId, cancellationToken: stoppingToken);
+            if (!string.IsNullOrEmpty(codemore))
+                job = codemore;
         }
 
         var result = await base.ExpandAsync(job, stoppingToken);
@@ -61,16 +72,18 @@ public class SqlJobProcessor(ILogger<SqlJobProcessor> logger, IOptions<Dictionar
     }
 
     /// <summary>
-    /// Logs "JobRunning" then "JobCompleted" (or "JobFailed" on error) around the actual action execution.
-    /// Base ProcessJobAsync still handles Next-chaining & error boundaries.
+    /// Logs "JobRunning" then "JobCompleted" (or "JobFailed" / "Job Cancelled"),
+    /// updating DB status accordingly. Base ProcessJobAsync still handles Next-chaining & error boundaries.
     /// </summary>
     protected override async Task JobProcessCoreAsync(string actionType, JsonObject mergedMore, CancellationToken stoppingToken)
     {
         var jobId = mergedMore.GetInt64("__jobId");
+
         try
         {
             _logger.LogInformation("Job Running");
-            if (jobId > 0) await _db.ExecAsync(WJbQueue.Set_Running, jobId, cancellationToken: stoppingToken);
+            if (jobId > 0)
+                await _db.ExecAsync(WJbQueue.Set_Running, jobId, cancellationToken: stoppingToken);
 
             await base.JobProcessCoreAsync(actionType, mergedMore, stoppingToken);
 
@@ -81,14 +94,12 @@ public class SqlJobProcessor(ILogger<SqlJobProcessor> logger, IOptions<Dictionar
         {
             _logger.LogInformation("Job Cancelled");
             await SetFinishAsync(jobId, (int)JobStatus.Cancelled, stoppingToken);
-
             throw;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Job Failed");
             await SetFinishAsync(jobId, (int)JobStatus.Failed, stoppingToken);
-
             throw;
         }
     }
@@ -97,9 +108,13 @@ public class SqlJobProcessor(ILogger<SqlJobProcessor> logger, IOptions<Dictionar
     {
         try
         {
-            if (jobId > 0) await _db.ExecAsync(WJbQueue.Finish, new { jobId, jobStatus }, cancellationToken: cancellationToken);
+            if (jobId > 0)
+                await _db.ExecAsync(WJbQueue.Finish, new { jobId, jobStatus }, cancellationToken: cancellationToken);
         }
-        catch { }
+        catch
+        {
+            // swallow finish errors to avoid masking the primary job exception
+        }
     }
 
     private enum JobStatus
