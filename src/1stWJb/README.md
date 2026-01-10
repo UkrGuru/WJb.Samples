@@ -3,17 +3,16 @@
 Minimal console demo using the **WJb** NuGet package.
 
 ## What it does
-- Registers your custom action `MyAction` (implements `IAction`).
-- Configures WJb with a default payload (`more: { name: "Oleksandr" }`).
+- Registers a custom action `MyAction` (implements `IAction`).
+- Configures WJb with default `more` data (`{ name: "Oleksandr" }`).
 - Enqueues two jobs:
-  1. **Defaults only** → prints `Hello Oleksandr!`
-  2. **Override defaults** → prints `Hello Viktor!`
-- Starts the host so WJb background processing can pick up the jobs.
+  1. Uses defaults → prints **Hello Oleksandr!**
+  2. Overrides defaults → prints **Hello Viktor!**
+- Runs the WJb background job processor.
 
 ## Sample Output
 
 ```
-info: WJb.JobProcessor[0] JobProcessor started
 Hello Viktor!
 Hello Oleksandr!
 ```

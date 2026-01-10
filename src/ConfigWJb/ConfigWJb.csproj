@@ -1,11 +1,21 @@
-
+﻿
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+      <!-- Default variant (you can change to Config2WJb, Config3WJb, or Config4WJb) -->
+      <ConfigVariant>Config1WJb</ConfigVariant>
   </PropertyGroup>
+
+  <!-- Exclude all Program.Config*.cs, then include only the selected variant -->
+  <ItemGroup>
+      <Compile Remove="Program.Config*.cs" />
+      <Compile Include="Program.$(ConfigVariant).cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="actions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -16,6 +26,6 @@
   </ItemGroup>
   <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-      <PackageReference Include="WJb" Version="0.22.2-beta" />
+      <PackageReference Include="WJb" Version="0.23.1-beta" />
   </ItemGroup>
 </Project>

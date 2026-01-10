@@ -16,7 +16,6 @@ var host = Host.CreateDefaultBuilder(args)
             o.SingleLine = true;
         });
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
-        logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
     })
     .ConfigureServices(services =>
     {
@@ -33,12 +32,11 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-await host.StartAsync();
-
 // Use processor
 var proc = host.Services.GetRequiredService<IJobProcessor>();
+
 var job = await proc.CompactAsync("SayHello", new { name = "Viktor" });
 await proc.EnqueueJobAsync(job, Priority.High);
 
-await Task.Delay(1000);
-await host.StopAsync();
+// Start the hosted service infrastructure (e.g., workers, background processing).
+await host.RunAsync();
