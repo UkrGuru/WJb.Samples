@@ -1,65 +1,51 @@
-# CronWJb – Cron-based scheduling with WJb (.NET 10)
+# CronWJb
 
-A tiny console app that runs **actions on cron schedules** using WJb.
+Minimal cron-based scheduler using WJb.
 
-## ✅ Requirements
+## Overview
+CronWJb loads actions from *actions.json*, registers them with WJb, and executes them according to cron expressions.
 
-*   **Target:** `net10.0`
-*   **Packages:**  
-    `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Logging.Console`, `WJb`
+## Features
+- Cron-based execution using WJb built-in scheduler.
+- Simple action model (`IAction`).
+- JSON-based configuration.
+- UTF-8 console output.
 
-## ▶️ Run
-
-```bash
+## Run
+```
 dotnet run
 ```
 
-Startup:
+## actions.json
+Contains a dictionary of actions with type and cron metadata.
 
-    CronWJb started. Waiting for cron ticks...
-     - HelloEveryMinute: */1 * * * *
-     - Hello9to5Weekdays: */3 9-21 * * 1-5
-
-## 📂 Layout
-
-    CronWJb/
-    ├─ Program.cs
-    ├─ JobScheduler.cs
-    ├─ actions.json
-
-## ⚙️ actions.json
-
+Example:
 ```json
 {
   "HelloEveryMinute": {
-    "Type": "DummyAction",
-    "More": { "cron": "*/1 * * * *", "message": "Minute tick ✅" }
+    "Type": "DummyAction, CronWJb",
+    "More": {
+      "cron": "*/1 * * * *",
+      "priority": "ASAP",
+      "message": "Minute tick ✅"
+    }
   },
   "Hello9to5Weekdays": {
-    "Type": "DummyAction",
-    "More": { "cron": "*/3 9-21 * * 1-5", "message": "Working hours ping" }
+    "Type": "DummyAction, CronWJb",
+    "More": {
+      "cron": "*/3 9-21 * * 1-5",
+      "priority": "High",
+      "message": "Working hours ping (every 5 minutes, Mon–Fri)"
+    }
   }
 }
 ```
 
-> **Cron format:** `minute hour day month weekday`  
-> Examples: `*/1 * * * *` (every minute), `0 0 * * *` (midnight daily).
+## Program.cs
+- Reads `actions.json`.
+- Registers WJb actions via `AddWJbActions`.
+- Enables scheduler via `AddWJbBase(jobScheduler: true)`.
+- Runs host.
 
-## 🔑 Key points
-
-*   UTF‑8 output:
-    ```csharp
-    Console.OutputEncoding = Encoding.UTF8;
-    ```
-*   Register WJb + scheduler:
-    ```csharp
-    services.AddWJb(actions);
-    services.AddHostedService<JobScheduler>();
-    ```
-*   Minimal action:
-    ```csharp
-    public sealed class DummyAction : IAction {
-        public Task ExecAsync(JsonObject? more, CancellationToken ct) =>
-            Task.Run(() => Console.WriteLine(more?["message"]));
-    }
-    ```
+## DummyAction
+A simple action that prints timestamp + message.

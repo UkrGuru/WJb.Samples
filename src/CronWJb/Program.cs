@@ -13,7 +13,6 @@ var actions = new Dictionary<string, ActionItem>();
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
-        // Optional: replace default providers to have full control
         logging.ClearProviders();
 
         logging.AddSimpleConsole(opt =>
@@ -22,17 +21,12 @@ var host = Host.CreateDefaultBuilder(args)
             opt.TimestampFormat = "HH:mm:ss ";
         });
 
-        // Hide logs from this category
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
-        logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
     })
     .ConfigureServices((ctx, services) =>
     {
-
-        // Load actions from actions.json (simple & success)
         var json = File.ReadAllText("actions.json");
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
+        actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
         services.AddWJbActions(actions).AddWJbBase(jobScheduler: true);
@@ -48,7 +42,6 @@ foreach (var kv in actions)
 
 await host.RunAsync();
 
-// Minimal action for demo implements IAction with ExecAsync only
 public sealed class DummyAction(ILogger<DummyAction> logger) : IAction
 {
     private readonly ILogger<DummyAction> _logger = logger;
