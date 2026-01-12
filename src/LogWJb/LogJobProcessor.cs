@@ -1,8 +1,8 @@
 ﻿
-using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using System.Text.Json.Nodes;
 using WJb;
+using WJb.Extensions;
 
 namespace LogWJb;
 
@@ -11,11 +11,11 @@ public class LogJobProcessor : JobProcessor
     private readonly ILogger<LogJobProcessor> _logger;
 
     public LogJobProcessor(
-        ILogger<LogJobProcessor> logger,
-        IOptions<Dictionary<string, object>> options,
+        IJobQueue queue,
         IActionFactory actionFactory,
-        IJobQueue queue)
-        : base(logger, options, actionFactory, queue)
+        IReloadableSettingsRegistry settingsRegistry,
+        ILogger<LogJobProcessor> logger)
+        : base(queue, actionFactory, settingsRegistry, logger)
     {
         _logger = logger;
     }
@@ -72,7 +72,6 @@ public class LogJobProcessor : JobProcessor
         CancellationToken stoppingToken)
     {
         _logger.LogInformation("Job Running");
-
         try
         {
             await base.JobProcessCoreAsync(actionType, mergedMore, stoppingToken);

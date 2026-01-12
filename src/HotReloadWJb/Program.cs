@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text.Json.Nodes;
@@ -6,15 +7,15 @@ using WJb;
 using WJb.Extensions;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureLogging(b => b.ClearProviders().AddSimpleConsole(o => o.TimestampFormat = "HH:mm:ss "))
+    .ConfigureLogging(b => b
+        .ClearProviders()
+        .AddSimpleConsole(o => o.TimestampFormat = "HH:mm:ss "))
     .ConfigureServices(services =>
     {
+        // 1) Reloadable settings registry
+        services.AddSingleton<IReloadableSettingsRegistry, ReloadableSettingsRegistry>(); // thread-safe settings store
 
-        // 1) Reloadable registries: Settings + Actions
-        services.AddSingleton<IReloadableSettingsRegistry, ReloadableSettingsRegistry>();        // thread-safe settings store
-        services.AddSingleton<IReloadableActionRegistry, ReloadableActionRegistry>();            // thread-safe actions store
-
-        // Live actions dictionary (used for initial load and manual modifications)
+        // Live actions dictionary (used for initial load and interactive modifications)
         var initialActions = new Dictionary<string, ActionItem>(StringComparer.OrdinalIgnoreCase)
         {
             ["Ping"] = new ActionItem
@@ -25,9 +26,9 @@ var builder = Host.CreateDefaultBuilder(args)
         };
 
         services
-            .AddSingleton(initialActions)                          // optional - for direct access
-            .AddWJbActions(initialActions)                         // registers IReloadableActionRegistry + probably others
-            .AddWJbBase(jobScheduler: true);                       // your extension that registers processor, scheduler, queue etc.
+            .AddSingleton(initialActions)   // optional – access to the live map for toggling
+            .AddWJbActions(initialActions)  // registers IActionFactory and aliases to IReloadableActionRegistry
+            .AddWJbBase(jobScheduler: true); // registers processor, scheduler, queue, etc. with new ctor orders
     });
 
 var host = builder.Build();
@@ -35,10 +36,10 @@ await host.StartAsync();
 
 Console.WriteLine("\n=== HotReloadWJb Sample ===\n");
 Console.WriteLine("Commands:");
-Console.WriteLine("  [E]  - Enqueue Ping action manually");
-Console.WriteLine("  [R]  - Toggle cron for Ping (triggers hot-reload)");
-Console.WriteLine("  [S]  - Reload actions from file (actions.json)");
-Console.WriteLine("  [Q]  - Quit\n");
+Console.WriteLine(" [E] - Enqueue Ping action manually");
+Console.WriteLine(" [R] - Toggle cron for Ping (triggers hot-reload)");
+Console.WriteLine(" [S] - Reload actions from file (actions.json)");
+Console.WriteLine(" [Q] - Quit\n");
 
 var services = host.Services;
 
@@ -56,8 +57,7 @@ while (true)
     var key = Console.ReadKey(true).Key;
     Console.WriteLine();
 
-    if (key == ConsoleKey.Q)
-        break;
+    if (key == ConsoleKey.Q) break;
 
     try
     {
@@ -68,7 +68,6 @@ while (true)
                     var job = await jobProcessor.CompactAsync("Ping", null);
                     liveActionsDict.TryGetValue("Ping", out var item);
                     var priority = item?.More?.GetPriority() ?? Priority.Normal;
-
                     await jobQueue.EnqueueAsync(job, priority);
                     logger.LogInformation("Manually enqueued Ping (priority: {Priority})", priority);
                     break;
@@ -83,7 +82,6 @@ while (true)
                     }
 
                     var more = pingItem.More ??= new JsonObject();
-
                     if (more.ContainsKey("cron"))
                     {
                         more.Remove("cron");
@@ -105,7 +103,6 @@ while (true)
                 {
                     Console.Write("Enter path to actions.json (or press Enter to skip): ");
                     var actionsPath = Console.ReadLine()?.Trim();
-
                     if (string.IsNullOrWhiteSpace(actionsPath))
                     {
                         logger.LogInformation("No path provided → reload skipped");
@@ -117,8 +114,8 @@ while (true)
                         actionRegistry.ReloadFromFile(actionsPath);
                         logger.LogInformation("Actions successfully reloaded from: {Path}", actionsPath);
 
-                        // Optional: force scheduler reload (if you want immediate effect without waiting event)
-                        //await jobScheduler.ReloadAsync();
+                        // Optional: force scheduler reload (immediate effect without waiting for event)
+                        // await jobScheduler.ReloadAsync();
                     }
                     catch (Exception ex)
                     {
@@ -153,3 +150,4 @@ public sealed class PingAction : IAction
 
     public Task NextAsync(JsonObject more, CancellationToken stoppingToken) => Task.CompletedTask;
 }
+
