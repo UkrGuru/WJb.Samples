@@ -37,3 +37,28 @@ public static class NextRouteHelper
         return (code, routed, overridePrio);
     }
 }
+
+public static class PriorityHelper
+{
+    public static Priority GetPriorityLoose(JsonObject? more, Priority fallback)
+    {
+        if (more is null) return fallback;
+
+        // 1) Try string (what MoreExtensions expects)
+        var s = more.GetString("priority");
+        if (!string.IsNullOrWhiteSpace(s) && Enum.TryParse<Priority>(s, true, out var parsed))
+            return parsed;
+
+        // 2) Try numeric
+        if (more.TryGetPropertyValue("priority", out var node) && node is JsonValue v)
+        {
+            if (v.TryGetValue<int>(out var i) && Enum.IsDefined(typeof(Priority), i))
+                return (Priority)i;
+
+            if (v.TryGetValue<long>(out var l) && Enum.IsDefined(typeof(Priority), (int)l))
+                return (Priority)(int)l;
+        }
+
+        return fallback;
+    }
+}
