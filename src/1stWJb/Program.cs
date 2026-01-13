@@ -30,16 +30,21 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-// Resolve processor
-var proc = host.Services.GetRequiredService<IJobProcessor>();
 
-// Enqueue default job
-await proc.EnqueueJobAsync(await proc.CompactAsync("MyAction"));
+// Resolve the job processor service
+var jobProcessor = host.Services.GetRequiredService<IJobProcessor>();
 
-// Enqueue job with override
-await proc.EnqueueJobAsync(await proc.CompactAsync("MyAction", new { name = "Viktor" }), Priority.High);
+// Prepare & Enqueue default job
+var defaultJob = await jobProcessor.CompactAsync("MyAction");
+await jobProcessor.EnqueueJobAsync(defaultJob);
 
+// Prepare & Enqueue override job
+var overrideJob = await jobProcessor.CompactAsync("MyAction", new { name = "Viktor" });
+await jobProcessor.EnqueueJobAsync(overrideJob, Priority.High);
+
+// Run the host
 await host.RunAsync();
+
 
 // Custom action
 public class MyAction : IAction

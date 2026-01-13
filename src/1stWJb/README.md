@@ -1,18 +1,26 @@
-# 1stWJb — WJb Demo (NuGet)
+# **1stWJb – Minimal Console App**
 
-Minimal console demo using the **WJb** NuGet package.
+A simple demo showing how to execute a job using the **WJb** library in a minimal console application.
 
-## What it does
-- Registers a custom action `MyAction` (implements `IAction`).
-- Configures WJb with default `more` data (`{ name: "Oleksandr" }`).
-- Enqueues two jobs:
-  1. Uses defaults → prints **Hello Oleksandr!**
-  2. Overrides defaults → prints **Hello Viktor!**
-- Runs the WJb background job processor.
+***
 
-## Sample Output
+## 🖥 **Main Code**
+
+```csharp
+// Prepare & Enqueue default job
+var defaultJob = await jobProcessor.CompactAsync("MyAction");
+await jobProcessor.EnqueueJobAsync(defaultJob);
+
+// Prepare & Enqueue override job
+var overrideJob = await jobProcessor.CompactAsync("MyAction", new { name = "Viktor" });
+await jobProcessor.EnqueueJobAsync(overrideJob, Priority.High);
+```
+
+***
+
+## 📌 **Expected Output**
 
 ```
-Hello Viktor!
-Hello Oleksandr!
+    Hello Viktor!
+    Hello Oleksandr!
 ```

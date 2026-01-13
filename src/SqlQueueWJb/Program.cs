@@ -20,8 +20,8 @@ var host = Host.CreateDefaultBuilder(args)
     {
         logging.ClearProviders();
         logging.AddSimpleConsole(o => o.SingleLine = true);
-        logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
-        logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
+        //logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
+        //logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.None);
     })
     .ConfigureServices((ctx, services) =>
     {
