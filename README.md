@@ -3,12 +3,6 @@
 [![Nuget](https://img.shields.io/nuget/v/WJb)](https://www.nuget.org/packages/WJb/)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellow.svg)](https://www.paypal.com/donate/?hosted_button_id=BPUF3H86X96YN)
 
-A curated collection of **20 minimal, focused demos** for the `WJb` package—showing scheduling, queues, APIs, UI integrations, reporting, and more.
-
-> **Naming convention:** `FeatureWJb` (e.g., `CronWJb`, `BlazorWJb`) for clarity and consistency.
-
-# WJb Demos
-
 A curated collection of **solution alive samples** for the `WJb` package—showing scheduling, queues, APIs, UI integrations, reporting, and more.
 
 > **Naming convention:** `FeatureWJb` (e.g., `CronWJb`, `BlazorWJb`) for clarity and consistency.
