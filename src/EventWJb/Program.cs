@@ -37,7 +37,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.Configure<Dictionary<string, object>>(cfg => { cfg["MaxParallelJobs"] = 2; });
 
         // Expose action map if needed by listeners
-        services.AddSingleton<IReadOnlyDictionary<string, ActionItem>>(actions);
+        //services.AddSingleton<IReadOnlyDictionary<string, ActionItem>>(actions);
 
         // Event listener hosted service
         services.AddHostedService<FileEventListener>();
