@@ -12,9 +12,6 @@ var builder = Host.CreateDefaultBuilder(args)
         .AddSimpleConsole(o => o.TimestampFormat = "HH:mm:ss "))
     .ConfigureServices(services =>
     {
-        // 1) Reloadable settings registry
-        services.AddSingleton<IReloadableSettingsRegistry, ReloadableSettingsRegistry>(); // thread-safe settings store
-
         // Live actions dictionary (used for initial load and interactive modifications)
         var initialActions = new Dictionary<string, ActionItem>(StringComparer.OrdinalIgnoreCase)
         {
@@ -27,8 +24,7 @@ var builder = Host.CreateDefaultBuilder(args)
 
         services
             .AddSingleton(initialActions)   // optional – access to the live map for toggling
-            .AddWJbActions(initialActions)  // registers IActionFactory and aliases to IReloadableActionRegistry
-            .AddWJbBase(jobScheduler: true); // registers processor, scheduler, queue, etc. with new ctor orders
+            .AddWJb(initialActions, addScheduler: true);
     });
 
 var host = builder.Build();

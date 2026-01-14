@@ -23,7 +23,7 @@ var host = Host.CreateDefaultBuilder(args)
                 More = new JsonObject { ["name"] = "Oleksandr" }
             }
         };
-        services.AddWJbActions(actions).AddWJbBase();
+        services.AddWJb(actions);
     })
     .Build();
 

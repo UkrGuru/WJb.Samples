@@ -51,7 +51,7 @@ var host = Host.CreateDefaultBuilder(args)
                 }
             )
         };
-        services.AddWJbActions(actions).AddWJbBase();
+        services.AddWJb(actions);
     })
     .Build();
 

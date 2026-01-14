@@ -29,7 +29,7 @@ var host = Host.CreateDefaultBuilder(args)
         actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
-        services.AddWJbActions(actions).AddWJbBase(jobScheduler: true);
+        services.AddWJb(actions, addScheduler: true);
     })
     .Build();
 

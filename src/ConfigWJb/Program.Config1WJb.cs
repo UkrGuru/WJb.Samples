@@ -23,7 +23,7 @@ var host = Host.CreateDefaultBuilder(args)
         var json = JsonSerializer.Serialize(ctx.Configuration.GetSection("WJb:Actions").Get<Dictionary<string, ActionItemDto>>() ?? []);
         var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, 
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
-        services.AddWJbActions(actions).AddWJbBase();
+        services.AddWJb(actions);
     })
     .Build();
 

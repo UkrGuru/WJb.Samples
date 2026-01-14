@@ -19,7 +19,7 @@ var host = Host.CreateDefaultBuilder(args)
         var json = File.ReadAllText("actions.json");
         var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-        services.AddWJbActions(actions).AddWJbBase();
+        services.AddWJb(actions);
     })
     .Build();
 

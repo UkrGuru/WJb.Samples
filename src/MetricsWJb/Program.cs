@@ -139,15 +139,14 @@ public sealed class DemoActionFactory : IActionFactory
         Reloaded?.Invoke();
     }
 
-    public void ReloadFromJson(string json)
+    private static JsonSerializerOptions GetOptions() => new() { PropertyNameCaseInsensitive = true };
+
+    public void ReloadFromJson(string json, JsonSerializerOptions? options = default)
     {
         if (string.IsNullOrWhiteSpace(json)) return;
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var parsed = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
-                     ?? new Dictionary<string, ActionItem>(StringComparer.OrdinalIgnoreCase);
-
-        Reload(parsed);
+        var map = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options ?? GetOptions())
+                  ?? new(StringComparer.OrdinalIgnoreCase);
+        Reload(map);
     }
 
     public void ReloadFromFile(string path)

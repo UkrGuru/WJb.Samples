@@ -29,23 +29,9 @@ var host = Host.CreateDefaultBuilder(args)
                 More = new JsonObject { ["name"] = "Oleksandr" }
             }
         };
-        services.AddWJbActions(actions);
 
-        //services.AddWJbBase(opts =>
-        //{
-        //    opts["MaxParallelJobs"] = 2;
-        //});
-
-        services.AddWJbBase(opts =>
-        {
-            var section = ctx.Configuration.GetSection("WJb:Settings");
-            foreach (var child in section.GetChildren())
-            {
-                if (int.TryParse(child.Value, out var i)) opts[child.Key] = i;
-                else opts[child.Key] = child.Value!;
-            }
-        });
-
+        services.AddWJb(actions, 
+            configureSettings: settings => ctx.Configuration.GetSection("WJb:Settings").Bind(settings));
     })
     .Build();
 

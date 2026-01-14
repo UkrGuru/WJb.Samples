@@ -17,7 +17,7 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         // Register WJb actions
-        services.AddWJbActions(
+        services.AddWJb(
             configureActions: map =>
             {
                 map["MyAction"] = new ActionItem(
@@ -25,8 +25,6 @@ var host = Host.CreateDefaultBuilder(args)
                     more: new { name = "Oleksandr" }
                 );
             });
-
-        services.AddWJbBase(); // Core WJb services
     })
     .Build();
 

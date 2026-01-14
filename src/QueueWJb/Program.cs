@@ -35,7 +35,7 @@ var host = Host.CreateDefaultBuilder(args)
                 more: new { items = new[] { "A", "B", "C" } }
             )
         };
-        services.AddWJbActions(actions).AddWJbBase();
+        services.AddWJb(actions);
     })
     .Build();
 
