@@ -1,0 +1,181 @@
+﻿
+@page "/actions"
+@attribute [StreamRendering]
+@rendermode InteractiveServer
+@using System.Text.Json
+@using System.IO
+@using System.Text.Json.Nodes
+
+<PageTitle>Actions</PageTitle>
+
+<h1>Actions</h1>
+
+<button class="btn btn-success mb-3" @onclick="SaveToFile">Save File (wjb\actions.json)</button>
+
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Code</th>
+            <th>Type</th>
+            <th>More</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in configItems)
+        {
+            <tr>
+                @if (editingItem?.Key == item.Key)
+                {
+                    <td><input class="form-control" @bind="editingItem.Key" /></td>
+                    <td><input class="form-control" @bind="editingItem.Value.type" /></td>
+                    <td><textarea class="form-control" @bind="editingItem.Value.smore" /></td>
+                    <td>
+                        <button class="btn btn-success btn-sm" @onclick="SaveEdit">Save</button>
+                        <button class="btn btn-secondary btn-sm ms-1" @onclick="CancelEdit">Cancel</button>
+                    </td>
+                }
+                else
+                {
+                    <td>@item.Key</td>
+                    <td>@item.Value.type</td>
+                    <td>@item.Value.more</td>
+                    <td class="text-nowrap">
+                        <button class="btn btn-primary btn-sm" @onclick="() => StartEdit(item)">Edit</button>
+                        <button class="btn btn-danger btn-sm ms-1" @onclick="() => Delete(item)">Delete</button>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="AddNew">Add New Entry</button>
+
+@code {
+    public class MoreSettings
+    {
+        public string? cron { get; set; }
+        public bool? enabled { get; set; }
+        // Add more properties as needed
+        public override string ToString() => System.Text.Json.JsonSerializer.Serialize(this);
+    }
+
+    public class ConfigEntry
+    {
+        public string? type { get; set; }
+        public JsonObject? more { get; set; }
+        public string? smore { get; set; }
+    }
+
+    public class ConfigItem
+    {
+        public string Key { get; set; } = string.Empty;
+        public ConfigEntry Value { get; set; } = new();
+    }
+
+    private List<ConfigItem> configItems = new();
+    private ConfigItem? editingItem;
+    private ConfigItem? backupItem;
+
+    private const string JsonFilePath = "wwwroot/wjb/actions.json";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFromFile();
+    }
+
+    private async Task LoadFromFile()
+    {
+        if (File.Exists(JsonFilePath))
+        {
+            var json = await File.ReadAllTextAsync(JsonFilePath);
+            var dict = JsonSerializer.Deserialize<Dictionary<string, ConfigEntry>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            configItems = dict?.Select(kv => new ConfigItem
+            {
+                Key = kv.Key,
+                Value = kv.Value ?? new ConfigEntry()
+            }).ToList() ?? new List<ConfigItem>();
+        }
+    }
+
+    private async Task SaveToFile()
+    {
+        var dict = configItems.ToDictionary(
+            item => item.Key,
+            item => new
+            {
+                item.Value.type,
+                item.Value.more
+            }
+        );
+
+        var json = JsonSerializer.Serialize(dict, new JsonSerializerOptions { WriteIndented = true });
+        await File.WriteAllTextAsync(JsonFilePath, json);
+        await LoadFromFile(); // Refresh
+    }
+
+    private void StartEdit(ConfigItem item)
+    {
+        item.Value.smore = item.Value.more?
+            .ToJsonString(new JsonSerializerOptions { WriteIndented = true }) ?? "{}";
+
+        backupItem = new ConfigItem
+        {
+            Key = item.Key,
+            Value = new ConfigEntry
+            {
+                type = item.Value.type,
+                more = item.Value.more, // new MoreSettings { cron = item.Value.more?.cron }
+                smore = item.Value.smore
+            }
+        };
+        editingItem = item;
+    }
+
+    private void SaveEdit()
+    {
+        if (editingItem != null)
+        {
+            var item = configItems.First(x => x.Key == editingItem.Key);
+            item.Value.type = editingItem.Value.type;
+            item.Value.more = string.IsNullOrWhiteSpace(editingItem.Value.smore) ? [] : JsonNode.Parse(editingItem.Value.smore) as JsonObject ?? [];
+        }
+
+        editingItem = null;
+        backupItem = null;
+    }
+
+    private void CancelEdit()
+    {
+        if (editingItem != null && backupItem != null)
+        {
+            var item = configItems.First(x => x.Key == editingItem.Key);
+            item.Key = backupItem.Key;
+            item.Value.type = backupItem.Value.type;
+            item.Value.more = backupItem.Value.more;
+
+            // if (item.Value.more != null && backupItem.Value.more != null)
+            //     item.Value.more.cron = backupItem.Value.more.cron;
+        }
+        editingItem = null;
+        backupItem = null;
+    }
+
+    private void AddNew()
+    {
+        var newItem = new ConfigItem
+        {
+            Key = "NewKey",
+            Value = new ConfigEntry { type = "NewType" }  // new MoreSettings { cron = "0 0 * * *" }
+        };
+        configItems.Add(newItem);
+        StartEdit(newItem);
+    }
+
+    private void Delete(ConfigItem item)
+    {
+        configItems.Remove(item);
+    }
+}

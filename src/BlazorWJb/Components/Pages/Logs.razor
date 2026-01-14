@@ -1,0 +1,188 @@
+﻿@page "/logs"
+@rendermode InteractiveServer
+@using BlazorWJb.Models
+@using BlazorWJb.Services
+@inject ILogFileReader Reader
+
+<h3>Logs</h3>
+
+<div class="row g-2 mb-2">
+    <div class="col-auto">
+        <InputDate @bind-Value="_selectedDate" class="form-control form-control-sm" />
+    </div>
+
+    <div class="col-auto">
+        <select class="form-select form-select-sm" @bind="_levelFilter">
+            <option value="">Level: All</option>
+            @foreach (var lvl in _levels)
+            {
+                <option value="@lvl">@lvl</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <select class="form-select form-select-sm" @bind="_categoryFilter">
+            <option value="">Category: All</option>
+            @foreach (var cat in _categories)
+            {
+                <option value="@cat">@cat</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <input class="form-control form-control-sm" placeholder="Contains..." @bind="_search" @bind:event="oninput" />
+    </div>
+
+    <div class="col-auto">
+        <button class="btn btn-sm btn-outline-primary" @onclick="ReloadAsync">Refresh</button>
+    </div>
+
+    <div class="col-auto align-self-center ms-auto">
+        <small class="text-muted">Updated: @($"{_lastUpdated:yyyy-MM-dd HH:mm:ss} | Rows: {_view.Count}")</small>
+    </div>
+</div>
+
+@if (_loading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!string.IsNullOrWhiteSpace(_error))
+{
+    <div class="alert alert-danger">@_error</div>
+}
+else if (_view.Count == 0)
+{
+    <div class="alert alert-info">No log entries for the chosen filters/date.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 160px;">Time</th>
+                    <th style="width: 90px;">Level</th>
+                    <th style="width: 280px;">Category</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in _view)
+                {
+                    <tr class="@RowClass(e.Level)">
+                        <td>@(e.Time.HasValue? e.Time.Value.ToString("HH:mm:ss.fff") : "")</td>
+                        <td class="text-uppercase">@e.Level</td>
+                        <td>@e.Category</td>
+                        <td style="white-space: pre-wrap">@e.Message</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private DateTime _selectedDate = DateTime.Now.Date;
+
+    private readonly List<LogEntry> _all = new();
+    private List<LogEntry> _view = new();
+    private HashSet<string> _levels = new(StringComparer.OrdinalIgnoreCase);
+    private HashSet<string> _categories = new(StringComparer.Ordinal);
+
+    private string _levelFilter = "";
+    private string _categoryFilter = "";
+    private string _search = "";
+
+    private bool _loading = true;
+    private string? _error;
+    private DateTime _lastUpdated;
+
+    private System.Timers.Timer? _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadAsync();
+
+        // Auto-refresh every 60s
+        _timer = new System.Timers.Timer(60_000);
+        _timer.Elapsed += async (_, __) =>
+        {
+            try { await InvokeAsync(ReloadAsync); } catch { /* ignore */ }
+        };
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Re-apply filters when bound values change
+        ApplyFilters();
+        await Task.CompletedTask;
+    }
+
+    private async Task ReloadAsync()
+    {
+        try
+        {
+            _loading = true;
+            _error = null;
+
+            // Read the correct daily file
+            var lines = await Reader.ReadLogLinesAsync(_selectedDate);
+            var parsed = LogLineParser.Parse(lines, _selectedDate).ToList();
+
+            _all.Clear();
+            _all.AddRange(parsed.OrderByDescending(e => e.Time ?? DateTime.MinValue));
+
+            _levels = _all.Select(e => e.Level).Where(s => !string.IsNullOrEmpty(s))
+                          .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            _categories = _all.Select(e => e.Category).Where(s => !string.IsNullOrEmpty(s))
+                              .ToHashSet(StringComparer.Ordinal);
+
+            ApplyFilters();
+            _lastUpdated = DateTime.Now;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ApplyFilters()
+    {
+        IEnumerable<LogEntry> q = _all;
+
+        if (!string.IsNullOrEmpty(_levelFilter))
+            q = q.Where(e => string.Equals(e.Level, _levelFilter, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrEmpty(_categoryFilter))
+            q = q.Where(e => string.Equals(e.Category, _categoryFilter, StringComparison.Ordinal));
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var s = _search.Trim();
+            q = q.Where(e =>
+                (e.Message?.IndexOf(s, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0
+                || (e.Category?.IndexOf(s, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0);
+        }
+
+        _view = q.Take(2000).ToList();
+    }
+
+    private string RowClass(string level) => level.ToLowerInvariant() switch
+    {
+        "error" or "fatal" => "table-danger",
+        "warn" or "warning" => "table-warning",
+        _ => ""
+    };
+
+    public void Dispose() => _timer?.Dispose();
+}
