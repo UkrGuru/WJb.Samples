@@ -13,6 +13,7 @@ A curated collection of **solution alive samples** for the `WJb` package—showi
 * [**SqlWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/SqlWJb) – Execute SQL commands via WJb.
 * [**QueueWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/QueueWJb) – Simple queue processing.
 * [**TimerWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/TimerWJb) – Scheduled jobs using delays.
+* [**BlazorWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/BlazorWJb) – Blazor integration for WJb jobs.
 
 ## ✅ **Scheduling & Triggers**
 * [**CronWJb**](https://github.com/UkrGuru/WJb.Samples/tree/main/src/CronWJb) – Cron-based scheduling.
