@@ -30,10 +30,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddTransient<MyTimerAction>();
 
         // Load actions from actions.json (simple & success)
-        var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "actions.json"));
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
-            ?? throw new InvalidOperationException("Failed to deserialize actions.json");
+        var actions = new Dictionary<string, ActionItem>(ActionMapLoader.CreateFromPath(Path.Combine(AppContext.BaseDirectory, "actions.json")));
 
         // Register WJb with loaded actions
         services.AddWJb(actions);

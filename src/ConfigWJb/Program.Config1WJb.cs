@@ -21,9 +21,7 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((ctx, services) =>
     {
         var json = JsonSerializer.Serialize(ctx.Configuration.GetSection("WJb:Actions").Get<Dictionary<string, ActionItemDto>>() ?? []);
-        var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, 
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
-        services.AddWJb(actions);
+        services.AddWJb(actions: ActionMapLoader.CreateFromJson(json));
     })
     .Build();
 

@@ -1,9 +1,11 @@
 ﻿using BlazorWJb.Components;
 using BlazorWJb.Logging;
 using BlazorWJb.Services;
+using System.Collections.ObjectModel;
 using System.Text.Json;
 using WJb;
 using WJb.Extensions;
+using WJb.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -21,11 +23,7 @@ var actionsPath = Path.Combine(builder.Environment.WebRootPath, "WJb", "actions.
 if (!File.Exists(actionsPath))
     throw new FileNotFoundException("actions.json was not found in the content root.", actionsPath);
 
-var json = await File.ReadAllTextAsync(actionsPath);
-var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-var actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, jsonOptions)
-              ?? throw new InvalidOperationException("Failed to deserialize actions.json into ActionItem dictionary.");
+var actions = ActionMapLoader.CreateFromPath(actionsPath);
 
 // --- Supply actions to WJb ---
 builder.Services.AddWJb(actions, addScheduler: true);

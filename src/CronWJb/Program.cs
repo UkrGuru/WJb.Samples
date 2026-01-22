@@ -25,11 +25,7 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((ctx, services) =>
     {
-        var json = File.ReadAllText("actions.json");
-        actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-            ?? throw new InvalidOperationException("Failed to deserialize actions.json");
-
-        services.AddWJb(actions, addScheduler: true);
+        services.AddWJb(actions: ActionMapLoader.CreateFromPath("actions.json"), addScheduler: true);
     })
     .Build();
 

@@ -107,7 +107,7 @@ while (true)
 
                     try
                     {
-                        actionRegistry.ReloadFromFile(actionsPath);
+                        actionRegistry.Reload(ActionMapLoader.CreateFromPath(actionsPath));
                         logger.LogInformation("Actions successfully reloaded from: {Path}", actionsPath);
 
                         // Optional: force scheduler reload (immediate effect without waiting for event)

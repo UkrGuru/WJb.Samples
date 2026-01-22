@@ -18,19 +18,20 @@ var host = Host.CreateDefaultBuilder(args)
     {
         // Register WJb actions
         services.AddWJb(
-            configureActions: map =>
+            actions: new Dictionary<string, WJb.ActionItem>
             {
-                map["MyAction"] = new ActionItem(
+                ["MyAction"] = new WJb.ActionItem(
                     type: typeof(MyAction).AssemblyQualifiedName!,
                     more: new { name = "Oleksandr" }
-                );
+                ),
             });
+
     })
     .Build();
 
 
 // Resolve the job processor service
-var jobProcessor = host.Services.GetRequiredService<IJobProcessor>();
+var jobProcessor = host.Services.GetRequiredService<WJb.IJobProcessor>();
 
 // Prepare & Enqueue default job
 var defaultJob = await jobProcessor.CompactAsync("MyAction");
@@ -38,7 +39,7 @@ await jobProcessor.EnqueueJobAsync(defaultJob);
 
 // Prepare & Enqueue override job
 var overrideJob = await jobProcessor.CompactAsync("MyAction", new { name = "Viktor" });
-await jobProcessor.EnqueueJobAsync(overrideJob, Priority.High);
+await jobProcessor.EnqueueJobAsync(overrideJob, WJb.Priority.High);
 
 // Run the host
 await host.RunAsync();

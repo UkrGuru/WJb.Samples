@@ -27,13 +27,9 @@ var host = Host.CreateDefaultBuilder(args)
     {
         // Load actions map
         var jsonPath = Path.Combine(AppContext.BaseDirectory, "actions.json");
-        var json = File.ReadAllText(jsonPath);
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        actions = JsonSerializer.Deserialize<Dictionary<string, ActionItem>>(json, options)
-            ?? throw new InvalidOperationException("Failed to deserialize actions.json");
 
         // WJb + Processor settings
-        services.AddWJb(actions);
+        services.AddWJb(actions: ActionMapLoader.CreateFromPath(jsonPath));
         services.Configure<Dictionary<string, object>>(cfg => { cfg["MaxParallelJobs"] = 2; });
 
         // Expose action map if needed by listeners

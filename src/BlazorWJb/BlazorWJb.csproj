@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WJb" Version="1.0.0-beta1" />
+    <PackageReference Include="WJb" Version="1.0.0-beta5" />
   </ItemGroup>
 
   <ItemGroup>
